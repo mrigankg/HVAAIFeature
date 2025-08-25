@@ -1,0 +1,9 @@
+Phase,Activity,Duration,Dependencies
+Phase 1,Set up AI Agent Studio and configure base agent,1 week,"AI Agent plugin activation, admin access"
+Phase 1,Create subflows for assessment analysis and priority calculation,2 weeks,OT vulnerability assessment data available
+Phase 1,Develop basic UI Builder experience with card layout,2 weeks,"UI Builder access, workspace configuration"
+Phase 2,Implement gamification elements and progress tracking,2 weeks,"Custom tables created, gamification framework"
+Phase 2,Build RAG integration with knowledge base,1 week,Knowledge base populated with vulnerability data
+Phase 3,Add advanced AI recommendations and scheduling,2 weeks,Calendar and email integrations configured
+Phase 3,Integrate with Change Management and notifications,1 week,Change Management process defined
+Phase 4,"User testing, refinement, and rollout",2 weeks,"Test users identified, feedback collection process"
