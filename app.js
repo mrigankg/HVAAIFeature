@@ -1,530 +1,522 @@
-// Application Data
-const appData = {
-  priorityActions: [
+// Application data from the provided JSON
+const assessmentData = {
+  assessmentSummary: {
+    totalAssessments: 47,
+    criticalAssessments: 10,
+    sitesAffected: ["Manufacturing Plant A", "Power Generation Unit 2", "Water Treatment Facility"],
+    processCriticality: "High",
+    riskScore: 8.7
+  },
+  criticalDevices: [
     {
-      id: 1,
-      title: "Critical PLC Firmware Vulnerability",
-      deviceCount: 8,
-      severity: "critical",
-      impact: "Production line shutdown risk",
-      recommendation: "Immediate patching during next maintenance window",
-      timeToAction: "24 hours",
-      cveId: "CVE-2024-8756"
+      deviceName: "PLC-MAIN-001",
+      deviceType: "Programmable Logic Controller",
+      site: "Manufacturing Plant A",
+      firmware: "v2.1.4",
+      vulnerabilities: ["CVE-2024-8756", "CVE-2024-7234"],
+      riskLevel: "Critical",
+      businessImpact: "Production line shutdown risk"
     },
     {
-      id: 2,
-      title: "HMI Authentication Bypass",
-      deviceCount: 15,
-      severity: "high", 
-      impact: "Unauthorized operator access",
-      recommendation: "Update firmware and reset default credentials",
-      timeToAction: "7 days",
-      cveId: "CVE-2024-7891"
+      deviceName: "HMI-OP-005",
+      deviceType: "Human Machine Interface", 
+      site: "Power Generation Unit 2",
+      firmware: "v1.8.2",
+      vulnerabilities: ["CVE-2024-7891"],
+      riskLevel: "High",
+      businessImpact: "Unauthorized operator access"
     },
     {
-      id: 3,
-      title: "SCADA System Buffer Overflow",
-      deviceCount: 3,
-      severity: "medium",
-      impact: "Service disruption possible",
-      recommendation: "Schedule patching with operations team",
-      timeToAction: "30 days", 
-      cveId: "CVE-2024-6543"
+      deviceName: "SCADA-WTR-003",
+      deviceType: "SCADA System",
+      site: "Water Treatment Facility",
+      firmware: "v3.2.1",
+      vulnerabilities: ["CVE-2024-6543", "CVE-2024-5432"],
+      riskLevel: "High", 
+      businessImpact: "Water quality monitoring disruption"
     }
   ],
-  userProgress: {
-    criticalResolved: 85,
-    monthlyTarget: 90,
-    streakDays: 12,
-    totalAssessments: 234,
-    completedActions: 198
-  },
-  achievements: [
-    {name: "Vulnerability Hunter", earned: true, description: "Resolved 50+ critical vulnerabilities"},
-    {name: "Risk Mitigator", earned: true, description: "Prevented 10+ security incidents"},
-    {name: "Security Champion", earned: false, description: "Maintain 30-day streak"}
+  remediationActions: [
+    {
+      action: "Firmware Update",
+      devices: 8,
+      priority: "Critical",
+      timeframe: "Next maintenance window (48 hours)",
+      assignee: "OT Security Team"
+    },
+    {
+      action: "Configuration Hardening",
+      devices: 6,
+      priority: "High", 
+      timeframe: "7 days",
+      assignee: "Site Operations"
+    },
+    {
+      action: "Network Segmentation Review",
+      devices: 4,
+      priority: "Medium",
+      timeframe: "30 days",
+      assignee: "Network Team"
+    }
   ],
   impactMetrics: {
-    incidentsPrevented: 27,
-    downtimePrevented: "156 hours",
-    costSaved: "$2.4M",
-    securityPostureScore: 94
-  },
-  recentSuccesses: [
-    "Resolved critical vulnerability in Assembly Line 2 - prevented potential 8-hour downtime",
-    "Completed monthly vulnerability assessment ahead of schedule",
-    "Achieved 95% compliance score for Q3"
-  ]
+    riskReductionPercent: 78,
+    vulnerabilitiesAddressed: 15,
+    devicesSecured: 10,
+    estimatedDowntimePrevented: "24 hours",
+    costAvoidance: "$1.2M"
+  }
 };
 
-// DOM Elements
-let actionCards, aiPanel, aiPanelToggle, actionModal, celebration;
-let modalTitle, modalBody, modalCancel, modalConfirm, modalClose;
-let alertBanner, alertClose, aiPanelClose;
+// Application state
+let currentStep = 1;
+const totalSteps = 5;
+
+// DOM elements
+let summaryScreen, analysisScreen, confirmationScreen, processingScreen, resultsScreen;
+let analyzeBtn, backToSummary, proceedBtn, cancelBtn, confirmProceedBtn;
+let viewDashboard, startNewAssessment;
+
+// Processing steps for animation
+const processingSteps = [
+  { id: 'step1', text: 'Analyzing vulnerability data', duration: 1500 },
+  { id: 'step2', text: 'Creating vulnerable items', duration: 2000 },
+  { id: 'step3', text: 'Generating remediation actions', duration: 1800 },
+  { id: 'step4', text: 'Calculating impact metrics', duration: 1200 }
+];
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('AI Agent Assessment application initialized');
+  
   // Get DOM elements
-  actionCards = document.getElementById('actionCards');
-  aiPanel = document.getElementById('aiPanel');
-  aiPanelToggle = document.getElementById('aiAssistantToggle');
-  actionModal = document.getElementById('actionModal');
-  celebration = document.getElementById('celebration');
+  initializeDOMElements();
   
-  modalTitle = document.getElementById('modalTitle');
-  modalBody = document.getElementById('modalBody');
-  modalCancel = document.getElementById('modalCancel');
-  modalConfirm = document.getElementById('modalConfirm');
-  modalClose = document.getElementById('modalClose');
-  
-  alertBanner = document.getElementById('alertBanner');
-  alertClose = document.getElementById('alertClose');
-  aiPanelClose = document.getElementById('aiPanelClose');
-
-  // Initialize components
-  renderActionCards();
-  initializeProgressCircles();
+  // Set up event listeners
   setupEventListeners();
   
-  // Debug log to verify elements are found
-  console.log('Dashboard initialized', {
-    aiPanelToggle: !!aiPanelToggle,
-    aiPanel: !!aiPanel,
-    alertClose: !!alertClose,
-    celebration: !!celebration
-  });
+  // Show initial screen
+  showStep(1);
 });
 
-// Render priority action cards
-function renderActionCards() {
-  if (!actionCards) return;
+function initializeDOMElements() {
+  // Screen elements
+  summaryScreen = document.getElementById('summaryScreen');
+  analysisScreen = document.getElementById('analysisScreen');
+  confirmationScreen = document.getElementById('confirmationScreen');
+  processingScreen = document.getElementById('processingScreen');
+  resultsScreen = document.getElementById('resultsScreen');
   
-  actionCards.innerHTML = '';
+  // Button elements
+  analyzeBtn = document.getElementById('analyzeBtn');
+  backToSummary = document.getElementById('backToSummary');
+  proceedBtn = document.getElementById('proceedBtn');
+  cancelBtn = document.getElementById('cancelBtn');
+  confirmProceedBtn = document.getElementById('confirmProceedBtn');
+  viewDashboard = document.getElementById('viewDashboard');
+  startNewAssessment = document.getElementById('startNewAssessment');
   
-  appData.priorityActions.forEach(action => {
-    const card = createActionCard(action);
-    actionCards.appendChild(card);
+  console.log('DOM elements initialized', {
+    summaryScreen: !!summaryScreen,
+    analysisScreen: !!analysisScreen,
+    confirmationScreen: !!confirmationScreen,
+    processingScreen: !!processingScreen,
+    resultsScreen: !!resultsScreen
   });
 }
 
-// Create individual action card
-function createActionCard(action) {
-  const card = document.createElement('div');
-  card.className = `action-card action-card--${action.severity}`;
-  card.setAttribute('data-action-id', action.id);
-  
-  card.innerHTML = `
-    <div class="action-card-header">
-      <h3 class="action-card-title">${action.title}</h3>
-      <span class="severity-badge severity-badge--${action.severity}">${action.severity}</span>
-    </div>
-    <div class="action-card-meta">
-      <div class="meta-item">
-        <span class="meta-value">${action.deviceCount}</span> devices affected
-      </div>
-      <div class="meta-item">
-        CVE: <span class="meta-value">${action.cveId}</span>
-      </div>
-    </div>
-    <div class="action-card-description">
-      <strong>Impact:</strong> ${action.impact}
-    </div>
-    <div class="action-card-footer">
-      <button class="btn btn--primary btn--sm action-btn">Take Action</button>
-      <div class="time-indicator">⏱️ ${action.timeToAction}</div>
-    </div>
-  `;
-  
-  // Add click event listener to the entire card
-  card.addEventListener('click', (e) => {
-    // Prevent opening modal if clicking the button specifically
-    if (!e.target.classList.contains('action-btn')) {
-      openActionModal(action);
-    }
-  });
-  
-  // Add specific click handler for the action button
-  const actionBtn = card.querySelector('.action-btn');
-  actionBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevent card click
-    openActionModal(action);
-  });
-  
-  return card;
-}
-
-// Initialize progress circles
-function initializeProgressCircles() {
-  const progressCircles = document.querySelectorAll('.progress-circle');
-  
-  progressCircles.forEach(circle => {
-    const progress = circle.getAttribute('data-progress');
-    if (progress) {
-      circle.style.setProperty('--progress', progress);
-      
-      // Animate the progress
-      setTimeout(() => {
-        circle.style.setProperty('--progress', progress);
-      }, 500);
-    }
-  });
-}
-
-// Setup event listeners
 function setupEventListeners() {
-  // AI Assistant toggle
-  if (aiPanelToggle) {
-    aiPanelToggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log('AI Assistant toggle clicked');
-      toggleAIPanel();
-    });
-  } else {
-    console.warn('AI Panel toggle button not found');
-  }
-  
-  // AI Panel close
-  if (aiPanelClose) {
-    aiPanelClose.addEventListener('click', (e) => {
-      e.preventDefault();
-      closeAIPanel();
+  // Step 1 -> Step 2
+  if (analyzeBtn) {
+    analyzeBtn.addEventListener('click', () => {
+      console.log('Analyze button clicked');
+      showStep(2);
     });
   }
   
-  // Alert banner close
-  if (alertClose) {
-    alertClose.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log('Alert close clicked');
-      closeAlert();
-    });
-  } else {
-    console.warn('Alert close button not found');
-  }
-  
-  // Modal event listeners
-  if (modalClose) {
-    modalClose.addEventListener('click', closeModal);
-  }
-  
-  if (modalCancel) {
-    modalCancel.addEventListener('click', closeModal);
-  }
-  
-  if (modalConfirm) {
-    modalConfirm.addEventListener('click', confirmAction);
-  }
-  
-  // Close modal when clicking backdrop
-  if (actionModal) {
-    actionModal.addEventListener('click', (e) => {
-      if (e.target === actionModal || e.target.classList.contains('modal-backdrop')) {
-        closeModal();
-      }
+  // Step 2 -> Step 1 (back)
+  if (backToSummary) {
+    backToSummary.addEventListener('click', () => {
+      console.log('Back to summary clicked');
+      showStep(1);
     });
   }
   
-  // Close celebration when clicking anywhere
-  if (celebration) {
-    celebration.addEventListener('click', closeCelebration);
+  // Step 2 -> Step 3
+  if (proceedBtn) {
+    proceedBtn.addEventListener('click', () => {
+      console.log('Proceed button clicked');
+      showStep(3);
+    });
   }
   
-  // Keyboard shortcuts
+  // Step 3 -> Step 2 (cancel)
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      console.log('Cancel button clicked');
+      showStep(2);
+    });
+  }
+  
+  // Step 3 -> Step 4 (confirm and start processing)
+  if (confirmProceedBtn) {
+    confirmProceedBtn.addEventListener('click', () => {
+      console.log('Confirm proceed button clicked');
+      showStep(4);
+      startProcessing();
+    });
+  }
+  
+  // Final screen buttons
+  if (viewDashboard) {
+    viewDashboard.addEventListener('click', () => {
+      console.log('View dashboard clicked');
+      // In a real application, this would navigate to the dashboard
+      alert('Navigating to Dashboard...');
+    });
+  }
+  
+  if (startNewAssessment) {
+    startNewAssessment.addEventListener('click', () => {
+      console.log('Start new assessment clicked');
+      // Reset to beginning
+      resetApplication();
+    });
+  }
+  
+  // Keyboard navigation
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (celebration && !celebration.classList.contains('hidden')) {
-        closeCelebration();
-      } else if (actionModal && !actionModal.classList.contains('hidden')) {
-        closeModal();
-      } else if (aiPanel && aiPanel.classList.contains('active')) {
-        closeAIPanel();
-      }
+    if (e.key === 'Escape' && currentStep === 3) {
+      // Allow escape to cancel confirmation
+      showStep(2);
     }
   });
 }
 
-// AI Panel functions
-function toggleAIPanel() {
-  if (!aiPanel) {
-    console.warn('AI Panel element not found');
-    return;
-  }
-  console.log('Toggling AI Panel, current state:', aiPanel.classList.contains('active'));
-  aiPanel.classList.toggle('active');
-}
-
-function closeAIPanel() {
-  if (!aiPanel) return;
-  aiPanel.classList.remove('active');
-}
-
-// Alert functions
-function closeAlert() {
-  if (!alertBanner) {
-    console.warn('Alert banner element not found');
-    return;
-  }
-  console.log('Closing alert banner');
-  alertBanner.classList.add('hidden');
-}
-
-// Modal functions
-function openActionModal(action) {
-  if (!actionModal || !modalTitle || !modalBody) return;
+function showStep(stepNumber) {
+  console.log(`Showing step ${stepNumber}`);
   
-  modalTitle.textContent = action.title;
+  // Hide all screens
+  const screens = [summaryScreen, analysisScreen, confirmationScreen, processingScreen, resultsScreen];
+  screens.forEach(screen => {
+    if (screen) screen.classList.remove('active');
+  });
   
-  modalBody.innerHTML = `
-    <div class="vulnerability-details">
-      <div class="detail-section">
-        <h4 class="detail-title">Vulnerability Information</h4>
-        <p class="detail-text">
-          <strong>CVE ID:</strong> <a href="https://nvd.nist.gov/vuln/detail/${action.cveId}" target="_blank" class="cve-link">${action.cveId}</a><br>
-          <strong>Severity:</strong> ${action.severity.toUpperCase()}<br>
-          <strong>Affected Devices:</strong> ${action.deviceCount} devices
-        </p>
-      </div>
+  // Show selected screen
+  currentStep = stepNumber;
+  switch (stepNumber) {
+    case 1:
+      if (summaryScreen) summaryScreen.classList.add('active');
+      break;
+    case 2:
+      if (analysisScreen) analysisScreen.classList.add('active');
+      break;
+    case 3:
+      if (confirmationScreen) confirmationScreen.classList.add('active');
+      break;
+    case 4:
+      if (processingScreen) processingScreen.classList.add('active');
+      break;
+    case 5:
+      if (resultsScreen) resultsScreen.classList.add('active');
+      break;
+  }
+  
+  // Update page title
+  updatePageTitle(stepNumber);
+}
+
+function updatePageTitle(stepNumber) {
+  const titles = {
+    1: 'Assessment Overview',
+    2: 'AI Analysis',
+    3: 'Confirmation',
+    4: 'Processing',
+    5: 'Results'
+  };
+  
+  const title = titles[stepNumber] || 'Hardware Vulnerability Assessment';
+  document.title = `${title} - AI Agent`;
+}
+
+function startProcessing() {
+  console.log('Starting processing animation');
+  
+  // Reset all processing steps
+  processingSteps.forEach((step, index) => {
+    const stepElement = document.getElementById(step.id);
+    if (stepElement) {
+      stepElement.classList.remove('completed', 'active');
       
-      <div class="detail-section">
-        <h4 class="detail-title">Impact Analysis</h4>
-        <p class="detail-text">${action.impact}</p>
-      </div>
+      // Set initial state
+      if (index === 0) {
+        stepElement.classList.add('active');
+      }
       
-      <div class="detail-section">
-        <h4 class="detail-title">AI Recommendation</h4>
-        <p class="detail-text">${action.recommendation}</p>
-      </div>
-      
-      <div class="detail-section">
-        <h4 class="detail-title">Time to Action</h4>
-        <p class="detail-text">
-          <strong>Recommended timeframe:</strong> ${action.timeToAction}<br>
-          ${action.severity === 'critical' ? 
-            '⚠️ <strong>Immediate attention required</strong> - This vulnerability poses significant risk to production systems.' :
-            '📅 Schedule maintenance window to address this vulnerability.'
-          }
-        </p>
-      </div>
-    </div>
-  `;
-  
-  // Store the action for confirmation
-  modalConfirm.setAttribute('data-action-id', action.id);
-  
-  actionModal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-  if (!actionModal) return;
-  
-  actionModal.classList.add('hidden');
-  document.body.style.overflow = '';
-}
-
-function confirmAction() {
-  const actionId = modalConfirm.getAttribute('data-action-id');
-  const action = appData.priorityActions.find(a => a.id == actionId);
-  
-  if (!action) return;
-  
-  console.log('Confirming action for:', action.title);
-  
-  // Close modal first
-  closeModal();
-  
-  // Show celebration
-  setTimeout(() => {
-    showCelebration();
-  }, 300);
-  
-  // Update progress (simulate progress increase)
-  setTimeout(() => {
-    updateProgress();
-  }, 1000);
-  
-  // Remove the action from the list (simulate completion)
-  setTimeout(() => {
-    removeCompletedAction(actionId);
-  }, 3500);
-}
-
-// Celebration functions
-function showCelebration() {
-  if (!celebration) {
-    console.warn('Celebration element not found');
-    return;
-  }
-  
-  console.log('Showing celebration');
-  celebration.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-  
-  // Auto-close after 3 seconds
-  setTimeout(() => {
-    closeCelebration();
-  }, 3000);
-}
-
-function closeCelebration() {
-  if (!celebration) return;
-  
-  celebration.classList.add('hidden');
-  document.body.style.overflow = '';
-}
-
-// Progress update functions
-function updateProgress() {
-  // Update progress circle
-  const progressCircle = document.querySelector('.progress-circle');
-  if (progressCircle) {
-    const currentProgress = parseInt(progressCircle.getAttribute('data-progress'));
-    const newProgress = Math.min(currentProgress + 5, 100);
-    progressCircle.setAttribute('data-progress', newProgress);
-    progressCircle.style.setProperty('--progress', newProgress);
-    
-    // Update the displayed value
-    const progressValue = progressCircle.querySelector('.progress-value');
-    if (progressValue) {
-      progressValue.textContent = `${newProgress}%`;
+      const iconElement = stepElement.querySelector('.step-icon');
+      if (iconElement) {
+        iconElement.textContent = index === 0 ? '⟳' : '○';
+      }
     }
-  }
+  });
   
-  // Update completed actions count
-  const statValues = document.querySelectorAll('.stat-value');
-  if (statValues.length >= 2) {
-    // Update completed actions (second stat)
-    const completedStat = statValues[1];
-    if (completedStat && completedStat.textContent === '198') {
-      completedStat.textContent = '199';
-    }
-  }
-  
-  // Update streak (first stat)
-  if (statValues.length >= 1) {
-    const streakStat = statValues[0];
-    if (streakStat && streakStat.textContent === '12') {
-      streakStat.textContent = '13';
-    }
-  }
+  // Process each step with delays
+  processStepSequentially(0);
 }
 
-function removeCompletedAction(actionId) {
-  // Remove from data
-  const actionIndex = appData.priorityActions.findIndex(a => a.id == actionId);
-  if (actionIndex > -1) {
-    appData.priorityActions.splice(actionIndex, 1);
-  }
-  
-  // Remove from DOM with animation
-  const card = document.querySelector(`[data-action-id="${actionId}"]`);
-  if (card) {
-    card.style.transition = 'all 0.5s ease-out';
-    card.style.opacity = '0';
-    card.style.transform = 'translateX(-100%)';
-    
+function processStepSequentially(stepIndex) {
+  if (stepIndex >= processingSteps.length) {
+    // All steps completed, move to results
     setTimeout(() => {
-      card.remove();
+      showStep(5);
+    }, 1000);
+    return;
+  }
+  
+  const step = processingSteps[stepIndex];
+  const stepElement = document.getElementById(step.id);
+  
+  if (stepElement) {
+    // Mark current step as active
+    stepElement.classList.add('active');
+    const iconElement = stepElement.querySelector('.step-icon');
+    if (iconElement) {
+      iconElement.textContent = '⟳';
+    }
+    
+    console.log(`Processing step ${stepIndex + 1}: ${step.text}`);
+    
+    // Complete this step after duration
+    setTimeout(() => {
+      stepElement.classList.remove('active');
+      stepElement.classList.add('completed');
+      if (iconElement) {
+        iconElement.textContent = '✓';
+      }
       
-      // If no more critical actions, update alert banner
-      const hasCritical = appData.priorityActions.some(a => a.severity === 'critical');
-      if (!hasCritical && alertBanner && !alertBanner.classList.contains('hidden')) {
-        const alertText = alertBanner.querySelector('.alert-text');
-        const alertIcon = alertBanner.querySelector('.alert-icon');
-        if (alertText && alertIcon) {
-          alertText.innerHTML = '<strong>Great Progress!</strong> All critical vulnerabilities have been addressed. Keep up the excellent work!';
-          alertBanner.style.backgroundColor = 'var(--color-bg-3)';
-          alertIcon.textContent = '✅';
+      // Start next step
+      const nextIndex = stepIndex + 1;
+      if (nextIndex < processingSteps.length) {
+        const nextStepElement = document.getElementById(processingSteps[nextIndex].id);
+        if (nextStepElement) {
+          nextStepElement.classList.add('active');
+          const nextIconElement = nextStepElement.querySelector('.step-icon');
+          if (nextIconElement) {
+            nextIconElement.textContent = '⟳';
+          }
         }
       }
-    }, 500);
+      
+      // Continue to next step
+      processStepSequentially(nextIndex);
+    }, step.duration);
+  } else {
+    console.warn(`Step element not found: ${step.id}`);
+    processStepSequentially(stepIndex + 1);
   }
 }
 
-// Utility functions
-function formatTimeAgo(hours) {
-  if (hours < 1) return 'Less than an hour ago';
-  if (hours === 1) return '1 hour ago';
-  if (hours < 24) return `${hours} hours ago`;
+function resetApplication() {
+  console.log('Resetting application');
+  currentStep = 1;
+  showStep(1);
   
-  const days = Math.floor(hours / 24);
-  if (days === 1) return '1 day ago';
-  return `${days} days ago`;
+  // Reset any processing states
+  processingSteps.forEach(step => {
+    const stepElement = document.getElementById(step.id);
+    if (stepElement) {
+      stepElement.classList.remove('completed', 'active');
+      const iconElement = stepElement.querySelector('.step-icon');
+      if (iconElement) {
+        iconElement.textContent = '○';
+      }
+    }
+  });
 }
 
-function getSeverityColor(severity) {
-  const colors = {
-    critical: '#dc2626',
-    high: '#ea580c',
-    medium: '#ca8a04',
-    low: '#16a34a'
-  };
-  return colors[severity] || '#6b7280';
-}
-
-// Auto-refresh functionality (simulate real-time updates)
-function initializeAutoRefresh() {
-  // Simulate periodic updates every 30 seconds
-  setInterval(() => {
-    // Update some random metrics to show "live" data
-    updateLiveMetrics();
-  }, 30000);
-}
-
-function updateLiveMetrics() {
-  // Simulate small changes in impact metrics
-  const impactValues = document.querySelectorAll('.impact-value');
+// Utility functions for enhanced UX
+function showLoadingState(button) {
+  if (!button) return;
   
-  if (impactValues.length >= 4) {
-    // Randomly increase incidents prevented
-    const incidentsElement = impactValues[0];
-    const current = parseInt(incidentsElement.textContent);
-    if (Math.random() > 0.7) { // 30% chance to update
-      incidentsElement.textContent = current + 1;
+  const originalText = button.textContent;
+  button.textContent = 'Processing...';
+  button.disabled = true;
+  
+  setTimeout(() => {
+    button.textContent = originalText;
+    button.disabled = false;
+  }, 1500);
+}
+
+function animateCountUp(element, finalValue) {
+  if (!element) return;
+  
+  const duration = 2000; // 2 seconds
+  const steps = 60;
+  const increment = finalValue / steps;
+  let currentValue = 0;
+  
+  const timer = setInterval(() => {
+    currentValue += increment;
+    if (currentValue >= finalValue) {
+      currentValue = finalValue;
+      clearInterval(timer);
     }
     
-    // Update security score slightly
-    const scoreElement = impactValues[3];
-    const currentScore = parseInt(scoreElement.textContent.replace('%', ''));
-    if (Math.random() > 0.8) { // 20% chance to update
-      const newScore = Math.min(currentScore + 1, 100);
-      scoreElement.textContent = `${newScore}%`;
+    // Update display based on type of value
+    if (typeof finalValue === 'string' && finalValue.includes('%')) {
+      element.textContent = Math.round(currentValue) + '%';
+    } else if (typeof finalValue === 'string' && finalValue.includes('$')) {
+      element.textContent = '$' + (currentValue / 1000000).toFixed(1) + 'M';
+    } else {
+      element.textContent = Math.round(currentValue);
     }
-  }
+  }, duration / steps);
 }
 
-// Initialize auto-refresh when page loads
+// Add some visual feedback for better UX
+function addButtonHoverEffects() {
+  const buttons = document.querySelectorAll('.btn');
+  
+  buttons.forEach(button => {
+    button.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-2px)';
+    });
+    
+    button.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+    });
+    
+    button.addEventListener('mousedown', function() {
+      this.style.transform = 'translateY(0)';
+    });
+  });
+}
+
+// Initialize enhanced UX features
 document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(initializeAutoRefresh, 5000); // Start after 5 seconds
+  setTimeout(() => {
+    addButtonHoverEffects();
+  }, 1000);
 });
 
-// Smooth scrolling for any anchor links
+// Add some Easter eggs and personality
+const aiPersonalityResponses = [
+  "Excellent choice! Let me analyze those critical vulnerabilities.",
+  "Processing... I love solving complex security puzzles!",
+  "Great! I'll have those remediation actions ready in no time.",
+  "Security first! I'm on it.",
+  "Time to make your infrastructure more secure!"
+];
+
+function showAIPersonality() {
+  const randomResponse = aiPersonalityResponses[Math.floor(Math.random() * aiPersonalityResponses.length)];
+  console.log('AI Agent says:', randomResponse);
+  
+  // You could show this in a toast notification or status message
+  // For now, just log it for personality
+}
+
+// Analytics and tracking (placeholder for real implementation)
+function trackUserAction(action, step) {
+  console.log(`Analytics: User performed "${action}" on step ${step}`);
+  
+  // In a real application, you would send this to your analytics service
+  // Example: analytics.track('vulnerability_assessment_action', { action, step, timestamp: new Date() });
+}
+
+// Enhanced event tracking
 document.addEventListener('click', function(e) {
-  if (e.target.tagName === 'A' && e.target.getAttribute('href') && e.target.getAttribute('href').startsWith('#')) {
-    e.preventDefault();
-    const targetId = e.target.getAttribute('href').substring(1);
-    const targetElement = document.getElementById(targetId);
+  if (e.target.classList.contains('btn')) {
+    const buttonText = e.target.textContent.trim();
+    trackUserAction(buttonText, currentStep);
     
-    if (targetElement) {
-      targetElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
+    // Add some AI personality on major actions
+    if (buttonText.includes('Proceed') || buttonText.includes('Analyze')) {
+      showAIPersonality();
     }
   }
 });
 
-// Performance optimization: Lazy load non-critical content
-function lazyLoadContent() {
-  // This would be used for loading additional data when needed
-  // For now, it's a placeholder for future enhancements
+// Performance monitoring (basic)
+function measureStepTransitionTime() {
+  const startTime = performance.now();
+  
+  return function() {
+    const endTime = performance.now();
+    const transitionTime = endTime - startTime;
+    console.log(`Step transition took ${transitionTime.toFixed(2)}ms`);
+    
+    // Track slow transitions
+    if (transitionTime > 500) {
+      console.warn('Slow step transition detected');
+    }
+  };
 }
 
-// Export functions for potential testing or external use
-window.VulnerabilityDashboard = {
-  openActionModal,
-  closeModal,
-  toggleAIPanel,
-  updateProgress,
-  showCelebration
+// Auto-save progress (in a real app, this would use localStorage or server)
+function saveProgress() {
+  const progressData = {
+    currentStep,
+    timestamp: new Date().toISOString(),
+    completed: currentStep === 5
+  };
+  
+  console.log('Progress saved:', progressData);
+  // localStorage.setItem('assessment_progress', JSON.stringify(progressData));
+}
+
+// Save progress on step changes
+const originalShowStep = showStep;
+showStep = function(stepNumber) {
+  const measureTime = measureStepTransitionTime();
+  originalShowStep(stepNumber);
+  measureTime();
+  saveProgress();
+};
+
+// Accessibility enhancements
+function enhanceAccessibility() {
+  // Add ARIA labels for screen readers
+  const stepScreens = document.querySelectorAll('.step-screen');
+  stepScreens.forEach((screen, index) => {
+    screen.setAttribute('aria-hidden', screen.classList.contains('active') ? 'false' : 'true');
+    screen.setAttribute('role', 'tabpanel');
+  });
+  
+  // Add keyboard navigation hints
+  const buttons = document.querySelectorAll('.btn');
+  buttons.forEach(button => {
+    button.setAttribute('role', 'button');
+    if (!button.getAttribute('aria-label')) {
+      button.setAttribute('aria-label', button.textContent.trim());
+    }
+  });
+}
+
+// Initialize accessibility features
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(enhanceAccessibility, 500);
+});
+
+// Error handling and recovery
+window.addEventListener('error', function(e) {
+  console.error('Application error:', e.error);
+  
+  // In a real application, you might want to:
+  // - Show a user-friendly error message
+  // - Attempt to recover or restart
+  // - Send error reports to monitoring service
+  
+  alert('An unexpected error occurred. The application will attempt to recover.');
+  resetApplication();
+});
+
+// Export functions for potential external use or testing
+window.VulnerabilityAssessment = {
+  showStep,
+  resetApplication,
+  startProcessing,
+  currentStep: () => currentStep,
+  assessmentData
 };

@@ -3,228 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServiceNow OT Vulnerability Assessment - AI Agent Dashboard</title>
+    <title>Hardware Vulnerability Assessment - AI Agent</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
-    <header class="dashboard-header">
+    <header class="header">
         <div class="container">
             <div class="header-content">
                 <div class="header-left">
-                    <h1 class="header-title">OT Vulnerability Assessment</h1>
-                    <span class="header-subtitle">AI-Powered Security Management</span>
+                    <h1 class="header-title">Hardware Vulnerability Assessment</h1>
+                    <span class="header-subtitle">AI-Powered Security Analysis</span>
                 </div>
                 <div class="header-right">
-                    <button class="btn btn--outline btn--sm" id="aiAssistantToggle">
-                        <span class="ai-indicator"></span>
-                        AI Assistant
-                    </button>
-                    <div class="user-profile">
-                        <span class="user-name">Sarah Chen</span>
-                        <div class="user-avatar">SC</div>
+                    <div class="ai-status">
+                        <span class="ai-indicator active"></span>
+                        <span class="ai-status-text">AI Agent Active</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">Security Administrator</span>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Dashboard -->
-    <main class="dashboard-main">
+    <!-- Main Content -->
+    <main class="main-content">
         <div class="container">
-            <!-- Alert Banner -->
-            <div class="alert-banner" id="alertBanner">
-                <div class="alert-content">
-                    <div class="alert-icon">🚨</div>
-                    <div class="alert-text">
-                        <strong>Immediate Action Required:</strong> 8 critical vulnerabilities detected across production systems
+            
+            <!-- Step 1: Assessment Summary -->
+            <div class="step-screen active" id="summaryScreen">
+                <div class="step-header">
+                    <h2>Assessment Results Overview</h2>
+                    <div class="step-indicator">
+                        <span class="step-number">1</span>
+                        <span class="step-text">of 5 - Initial Analysis</span>
                     </div>
-                    <button class="alert-close" id="alertClose">&times;</button>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card total-assessments">
+                        <div class="summary-icon">📊</div>
+                        <div class="summary-content">
+                            <div class="summary-number">47</div>
+                            <div class="summary-label">Total Assessments</div>
+                            <div class="summary-detail">Completed across all sites</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card critical-assessments">
+                        <div class="summary-icon">🚨</div>
+                        <div class="summary-content">
+                            <div class="summary-number critical">10</div>
+                            <div class="summary-label">Critical Assessments</div>
+                            <div class="summary-detail">Requiring immediate attention</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card risk-score">
+                        <div class="summary-icon">⚡</div>
+                        <div class="summary-content">
+                            <div class="summary-number warning">8.7</div>
+                            <div class="summary-label">Risk Score</div>
+                            <div class="summary-detail">Out of 10.0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sites-affected">
+                    <h3>Critical Sites Affected</h3>
+                    <div class="sites-list">
+                        <div class="site-item">
+                            <span class="site-icon">🏭</span>
+                            <span class="site-name">Manufacturing Plant A</span>
+                            <span class="site-status critical">Critical Process</span>
+                        </div>
+                        <div class="site-item">
+                            <span class="site-icon">⚡</span>
+                            <span class="site-name">Power Generation Unit 2</span>
+                            <span class="site-status critical">Critical Process</span>
+                        </div>
+                        <div class="site-item">
+                            <span class="site-icon">💧</span>
+                            <span class="site-name">Water Treatment Facility</span>
+                            <span class="site-status critical">Critical Process</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn--primary btn--lg" id="analyzeBtn">
+                        Let AI Agent Analyze Critical Items
+                    </button>
                 </div>
             </div>
 
-            <!-- Dashboard Grid -->
-            <div class="dashboard-grid">
-                <!-- Priority Actions Section -->
-                <section class="dashboard-section priority-section">
-                    <h2 class="section-title">Priority Actions</h2>
-                    <div class="action-cards" id="actionCards">
-                        <!-- Action cards will be populated by JavaScript -->
-                    </div>
-                </section>
-
-                <!-- Progress & Achievements -->
-                <aside class="dashboard-sidebar">
-                    <!-- Progress Section -->
-                    <div class="card progress-card">
-                        <div class="card__body">
-                            <h3 class="section-title">Your Progress</h3>
-                            <div class="progress-metrics">
-                                <div class="progress-item">
-                                    <div class="progress-circle" data-progress="85">
-                                        <div class="progress-value">85%</div>
-                                        <div class="progress-label">Critical Resolved</div>
-                                    </div>
-                                </div>
-                                <div class="progress-stats">
-                                    <div class="stat-item">
-                                        <span class="stat-value">12</span>
-                                        <span class="stat-label">Day Streak</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <span class="stat-value">198</span>
-                                        <span class="stat-label">Actions Completed</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Achievements Section -->
-                    <div class="card achievements-card">
-                        <div class="card__body">
-                            <h3 class="section-title">Achievements</h3>
-                            <div class="achievements-list">
-                                <div class="achievement earned">
-                                    <div class="achievement-badge">🏆</div>
-                                    <div class="achievement-info">
-                                        <div class="achievement-name">Vulnerability Hunter</div>
-                                        <div class="achievement-desc">Resolved 50+ critical vulnerabilities</div>
-                                    </div>
-                                </div>
-                                <div class="achievement earned">
-                                    <div class="achievement-badge">🛡️</div>
-                                    <div class="achievement-info">
-                                        <div class="achievement-name">Risk Mitigator</div>
-                                        <div class="achievement-desc">Prevented 10+ security incidents</div>
-                                    </div>
-                                </div>
-                                <div class="achievement locked">
-                                    <div class="achievement-badge">⭐</div>
-                                    <div class="achievement-info">
-                                        <div class="achievement-name">Security Champion</div>
-                                        <div class="achievement-desc">Maintain 30-day streak</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Impact Metrics -->
-                    <div class="card impact-card">
-                        <div class="card__body">
-                            <h3 class="section-title">Impact This Quarter</h3>
-                            <div class="impact-metrics">
-                                <div class="impact-item">
-                                    <div class="impact-value">27</div>
-                                    <div class="impact-label">Incidents Prevented</div>
-                                </div>
-                                <div class="impact-item">
-                                    <div class="impact-value">$2.4M</div>
-                                    <div class="impact-label">Cost Saved</div>
-                                </div>
-                                <div class="impact-item">
-                                    <div class="impact-value">156h</div>
-                                    <div class="impact-label">Downtime Prevented</div>
-                                </div>
-                                <div class="impact-item">
-                                    <div class="impact-value">94%</div>
-                                    <div class="impact-label">Security Score</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
-            </div>
-
-            <!-- Recent Successes -->
-            <section class="recent-successes">
-                <h2 class="section-title">Recent Successes</h2>
-                <div class="success-timeline">
-                    <div class="success-item">
-                        <div class="success-icon">✅</div>
-                        <div class="success-text">Resolved critical vulnerability in Assembly Line 2 - prevented potential 8-hour downtime</div>
-                        <div class="success-time">2 hours ago</div>
-                    </div>
-                    <div class="success-item">
-                        <div class="success-icon">🎯</div>
-                        <div class="success-text">Completed monthly vulnerability assessment ahead of schedule</div>
-                        <div class="success-time">1 day ago</div>
-                    </div>
-                    <div class="success-item">
-                        <div class="success-icon">📊</div>
-                        <div class="success-text">Achieved 95% compliance score for Q3</div>
-                        <div class="success-time">3 days ago</div>
+            <!-- Step 2: AI Agent Analysis -->
+            <div class="step-screen" id="analysisScreen">
+                <div class="step-header">
+                    <h2>AI Agent Analysis</h2>
+                    <div class="step-indicator">
+                        <span class="step-number">2</span>
+                        <span class="step-text">of 5 - AI Analysis</span>
                     </div>
                 </div>
-            </section>
+
+                <div class="ai-agent-section">
+                    <div class="ai-agent-avatar">
+                        <div class="ai-avatar">🤖</div>
+                        <div class="ai-name">Security AI Agent</div>
+                    </div>
+                    
+                    <div class="ai-message">
+                        <div class="ai-message-content">
+                            <h3>Critical Assessment Analysis</h3>
+                            <p>I've identified <strong>10 critical assessments</strong> that require immediate attention due to:</p>
+                            
+                            <div class="analysis-reasons">
+                                <div class="reason-item">
+                                    <span class="reason-icon">🏭</span>
+                                    <div class="reason-content">
+                                        <strong>Site Criticality:</strong> All affected sites support critical business processes
+                                    </div>
+                                </div>
+                                <div class="reason-item">
+                                    <span class="reason-icon">⚡</span>
+                                    <div class="reason-content">
+                                        <strong>Process Criticality:</strong> High-impact systems controlling production and safety
+                                    </div>
+                                </div>
+                                <div class="reason-item">
+                                    <span class="reason-icon">🎯</span>
+                                    <div class="reason-content">
+                                        <strong>Risk Assessment:</strong> Combined risk score of 8.7/10 indicates severe exposure
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="ai-recommendation">
+                                <h4>My Recommendation:</h4>
+                                <p>I can automatically create vulnerable items for all critical devices and generate comprehensive remediation actions. This will help you address the highest-priority risks immediately.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn--outline btn--lg" id="backToSummary">Back</button>
+                    <button class="btn btn--primary btn--lg" id="proceedBtn">Proceed with AI Analysis</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Confirmation Dialog -->
+            <div class="step-screen" id="confirmationScreen">
+                <div class="step-header">
+                    <h2>Confirm AI Action</h2>
+                    <div class="step-indicator">
+                        <span class="step-number">3</span>
+                        <span class="step-text">of 5 - Confirmation</span>
+                    </div>
+                </div>
+
+                <div class="confirmation-dialog">
+                    <div class="confirmation-icon">⚠️</div>
+                    <h3>AI Agent Ready to Proceed</h3>
+                    <p>The AI Agent will now:</p>
+                    
+                    <div class="action-list">
+                        <div class="action-item">
+                            <span class="action-check">✓</span>
+                            <span class="action-text">Create vulnerable items for 10 critical devices</span>
+                        </div>
+                        <div class="action-item">
+                            <span class="action-check">✓</span>
+                            <span class="action-text">Generate prioritized remediation actions</span>
+                        </div>
+                        <div class="action-item">
+                            <span class="action-check">✓</span>
+                            <span class="action-text">Assign tasks to appropriate teams</span>
+                        </div>
+                        <div class="action-item">
+                            <span class="action-check">✓</span>
+                            <span class="action-text">Calculate risk reduction impact</span>
+                        </div>
+                    </div>
+
+                    <div class="confirmation-warning">
+                        <strong>Note:</strong> This action will create work items and notifications for your security teams.
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn--outline btn--lg" id="cancelBtn">Cancel</button>
+                    <button class="btn btn--primary btn--lg" id="confirmProceedBtn">Yes, Proceed</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Processing Screen -->
+            <div class="step-screen" id="processingScreen">
+                <div class="step-header">
+                    <h2>AI Agent Processing</h2>
+                    <div class="step-indicator">
+                        <span class="step-number">4</span>
+                        <span class="step-text">of 5 - Processing</span>
+                    </div>
+                </div>
+
+                <div class="processing-section">
+                    <div class="processing-animation">
+                        <div class="ai-avatar processing">🤖</div>
+                        <div class="processing-dots">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                    </div>
+
+                    <div class="processing-status">
+                        <h3>AI Agent Working...</h3>
+                        <div class="processing-steps">
+                            <div class="processing-step completed" id="step1">
+                                <span class="step-icon">✓</span>
+                                <span class="step-text">Analyzing vulnerability data</span>
+                            </div>
+                            <div class="processing-step active" id="step2">
+                                <span class="step-icon">⟳</span>
+                                <span class="step-text">Creating vulnerable items</span>
+                            </div>
+                            <div class="processing-step" id="step3">
+                                <span class="step-icon">○</span>
+                                <span class="step-text">Generating remediation actions</span>
+                            </div>
+                            <div class="processing-step" id="step4">
+                                <span class="step-icon">○</span>
+                                <span class="step-text">Calculating impact metrics</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Results Screen -->
+            <div class="step-screen" id="resultsScreen">
+                <div class="step-header">
+                    <h2>Results Summary</h2>
+                    <div class="step-indicator">
+                        <span class="step-number">5</span>
+                        <span class="step-text">of 5 - Complete</span>
+                    </div>
+                </div>
+
+                <div class="results-success">
+                    <div class="success-icon">🎉</div>
+                    <h3>AI Agent Completed Successfully!</h3>
+                    <p>Risk has been significantly reduced through automated analysis and action planning.</p>
+                </div>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h4>Vulnerable Items Created</h4>
+                        <div class="result-list">
+                            <div class="result-item">
+                                <span class="device-icon">🔧</span>
+                                <div class="device-info">
+                                    <div class="device-name">PLC-MAIN-001</div>
+                                    <div class="device-detail">CVE-2024-8756, CVE-2024-7234</div>
+                                </div>
+                                <span class="status critical">Critical</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="device-icon">🖥️</span>
+                                <div class="device-info">
+                                    <div class="device-name">HMI-OP-005</div>
+                                    <div class="device-detail">CVE-2024-7891</div>
+                                </div>
+                                <span class="status high">High</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="device-icon">📡</span>
+                                <div class="device-info">
+                                    <div class="device-name">SCADA-WTR-003</div>
+                                    <div class="device-detail">CVE-2024-6543, CVE-2024-5432</div>
+                                </div>
+                                <span class="status high">High</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h4>Remediation Actions</h4>
+                        <div class="result-list">
+                            <div class="action-result-item">
+                                <span class="action-icon">⚡</span>
+                                <div class="action-info">
+                                    <div class="action-name">Firmware Updates</div>
+                                    <div class="action-detail">8 devices • Critical Priority</div>
+                                    <div class="action-timeline">Next maintenance window (48 hours)</div>
+                                </div>
+                            </div>
+                            <div class="action-result-item">
+                                <span class="action-icon">🔒</span>
+                                <div class="action-info">
+                                    <div class="action-name">Configuration Hardening</div>
+                                    <div class="action-detail">6 devices • High Priority</div>
+                                    <div class="action-timeline">Within 7 days</div>
+                                </div>
+                            </div>
+                            <div class="action-result-item">
+                                <span class="action-icon">🌐</span>
+                                <div class="action-info">
+                                    <div class="action-name">Network Segmentation</div>
+                                    <div class="action-detail">4 devices • Medium Priority</div>
+                                    <div class="action-timeline">Within 30 days</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="impact-summary">
+                    <h3>Impact Assessment</h3>
+                    <div class="impact-metrics">
+                        <div class="impact-item">
+                            <div class="impact-value">78%</div>
+                            <div class="impact-label">Risk Reduction</div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-value">15</div>
+                            <div class="impact-label">Vulnerabilities Addressed</div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-value">24h</div>
+                            <div class="impact-label">Downtime Prevented</div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-value">$1.2M</div>
+                            <div class="impact-label">Cost Avoidance</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="final-message">
+                    <div class="ai-agent-final">
+                        <div class="ai-avatar">🤖</div>
+                        <div class="final-text">
+                            <strong>Great job!</strong> The AI Agent has successfully reduced your security risk by 78%. All critical vulnerabilities have been prioritized and assigned to the appropriate teams. Continue monitoring the remediation progress in your dashboard.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn--outline btn--lg" id="viewDashboard">View Dashboard</button>
+                    <button class="btn btn--primary btn--lg" id="startNewAssessment">Start New Assessment</button>
+                </div>
+            </div>
+
         </div>
     </main>
-
-    <!-- AI Assistant Panel -->
-    <div class="ai-panel" id="aiPanel">
-        <div class="ai-panel-header">
-            <h3>AI Assistant</h3>
-            <button class="ai-panel-close" id="aiPanelClose">&times;</button>
-        </div>
-        <div class="ai-panel-content">
-            <div class="ai-message">
-                <div class="ai-avatar">🤖</div>
-                <div class="ai-text">
-                    I've analyzed your current vulnerability landscape. Here are my recommendations:
-                </div>
-            </div>
-            <div class="ai-recommendations">
-                <div class="ai-recommendation">
-                    <strong>Priority 1:</strong> Address CVE-2024-8756 immediately - affects 8 production PLCs
-                </div>
-                <div class="ai-recommendation">
-                    <strong>Priority 2:</strong> Schedule maintenance window for HMI updates within 7 days
-                </div>
-                <div class="ai-recommendation">
-                    <strong>Optimization:</strong> Current resolution rate is 15% above target - great work!
-                </div>
-            </div>
-            <div class="ai-actions">
-                <button class="btn btn--primary btn--sm">Create Action Plan</button>
-                <button class="btn btn--outline btn--sm">Schedule Maintenance</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Action Modal -->
-    <div class="modal hidden" id="actionModal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Vulnerability Details</h3>
-                <button class="modal-close" id="modalClose">&times;</button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Modal content will be populated by JavaScript -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn--outline" id="modalCancel">Cancel</button>
-                <button class="btn btn--primary" id="modalConfirm">Take Action</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Celebration -->
-    <div class="celebration hidden" id="celebration">
-        <div class="celebration-content">
-            <div class="celebration-animation">🎉</div>
-            <h3>Excellent Work!</h3>
-            <p>You've successfully addressed a critical vulnerability!</p>
-            <div class="celebration-stats">
-                <div>+50 Security Points</div>
-                <div>Streak maintained!</div>
-            </div>
-        </div>
-    </div>
 
     <script src="app.js"></script>
 </body>
