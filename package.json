@@ -1,0 +1,7 @@
+{
+  "name": "static-frontend",
+  "private": true,
+  "scripts": {
+    "build": "echo \"(placeholder) Minify or bundle here\""
+  }
+}
