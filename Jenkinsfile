@@ -8,12 +8,12 @@ pipeline {
   }
 
   tools {
-    // Jenkins → Manage Jenkins → Global Tool Configuration → NodeJS → Name: node18
-    nodejs 'node18'
+    // Configure this in Jenkins:  Manage Jenkins → Global Tool Configuration → NodeJS → Name: node20
+    nodejs 'node20'
   }
 
   environment {
-    CI = 'true' // many JS tools behave better in CI mode
+    CI = 'true'
   }
 
   stages {
@@ -33,7 +33,6 @@ pipeline {
 
     stage('Install Dependencies') {
       steps {
-        // Use npm ci if package-lock.json exists, else fall back to npm install
         sh '''
           if [ -f package-lock.json ]; then
             npm ci
@@ -52,14 +51,12 @@ pipeline {
 
     stage('Test') {
       steps {
-        // Don’t fail the build if no tests are defined
         sh 'npm test -- --watch=false || echo "No tests to run"'
       }
     }
 
     stage('Archive Build Artifacts') {
       steps {
-        // Support common frontend outputs: build/ (CRA) or dist/ (Vite/Webpack)
         archiveArtifacts artifacts: 'build/**, dist/**', fingerprint: true, allowEmptyArchive: true
       }
     }
@@ -67,13 +64,12 @@ pipeline {
 
   post {
     success {
-      echo '🎉 Build successful!'
+      echo '🎉 Build successful with Node 20!'
     }
     failure {
-      echo '❌ Build failed. Check console log.'
+      echo '❌ Build failed — check console output.'
     }
     always {
-      // keep workspace tidy between runs
       cleanWs(deleteDirs: true)
     }
   }
