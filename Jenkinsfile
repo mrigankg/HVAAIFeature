@@ -3,17 +3,13 @@ pipeline {
 
   options {
     timestamps()
-    ansiColor('xterm')
     disableConcurrentBuilds()
   }
 
-  tools {
-    // Configure this in Jenkins:  Manage Jenkins → Global Tool Configuration → NodeJS → Name: node20
-    nodejs 'node20'
-  }
-
   environment {
-    CI = 'true'
+    // Add Homebrew path so Jenkins finds Node 25.1.0
+    PATH = "/opt/homebrew/bin:/usr/local/bin:${PATH}"
+    CI   = 'true'
   }
 
   stages {
@@ -25,9 +21,13 @@ pipeline {
 
     stage('Check Node') {
       steps {
-        sh 'echo "PATH=$PATH"'
-        sh 'which node && node -v'
-        sh 'which npm && npm -v'
+        sh '''
+          echo "PATH=$PATH"
+          which node || echo "Node not found!"
+          node -v || (echo "❌ Node not installed or PATH not set properly" && exit 1)
+          which npm || echo "npm not found!"
+          npm -v || (echo "❌ npm missing" && exit 1)
+        '''
       }
     }
 
@@ -35,8 +35,10 @@ pipeline {
       steps {
         sh '''
           if [ -f package-lock.json ]; then
+            echo "Installing dependencies using npm ci..."
             npm ci
           else
+            echo "Installing dependencies using npm install..."
             npm install
           fi
         '''
@@ -45,13 +47,15 @@ pipeline {
 
     stage('Build') {
       steps {
+        echo 'Running build...'
         sh 'npm run build'
       }
     }
 
     stage('Test') {
       steps {
-        sh 'npm test -- --watch=false || echo "No tests to run"'
+        echo 'Running tests...'
+        sh 'npm test -- --watch=false || echo "No tests found."'
       }
     }
 
@@ -64,7 +68,7 @@ pipeline {
 
   post {
     success {
-      echo '🎉 Build successful with Node 20!'
+      echo '✅ Build successful with Node 25.1.0!'
     }
     failure {
       echo '❌ Build failed — check console output.'
